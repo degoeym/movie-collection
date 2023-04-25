@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using AutoMapper;
 using Components;
 using Data;
 using Microsoft.AspNetCore.Http.Json;
@@ -14,6 +15,13 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped<IMovieOperations, MovieOperations>();
 builder.Services.AddScoped<RouterBase, MovieRouter>();
+
+var mappingConfig = new MapperConfiguration(mc => {
+    mc.AddProfile(new MovieCollectionProfile());
+});
+
+var autoMapper = mappingConfig.CreateMapper();
+builder.Services.AddSingleton(autoMapper);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
