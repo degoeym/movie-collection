@@ -1,4 +1,5 @@
 using Components;
+using Data.DTOs;
 using Data.Models;
 using Operations;
 
@@ -18,8 +19,8 @@ public class MovieRouter : RouterBase
     {
         app.MapGet($"/{UrlFragment}", () => GetAllMovies());
         app.MapGet($"/{UrlFragment}/{{id:guid}}", (Guid id) => GetMovie(id));
-        app.MapPost($"/{UrlFragment}", (Movie movie) => AddMovie(movie));
-        app.MapPut($"/{UrlFragment}", (Movie movie) => UpdateMovie(movie));
+        app.MapPost($"/{UrlFragment}", (NewMovieDto newMovie) => AddMovie(newMovie));
+        app.MapPut($"/{UrlFragment}/{{id:guid}}", (Guid id, UpdateMovieDto updatedMovie) => UpdateMovie(id, updatedMovie));
         app.MapDelete($"/{UrlFragment}/{{id:guid}}", (Guid id) => DeleteMovie(id));
     }
 
@@ -33,18 +34,28 @@ public class MovieRouter : RouterBase
         return TypedResults.Ok(await _operations.GetMoviesAsync());
     }
 
-    protected async virtual Task<IResult> AddMovie(Movie movie)
+    protected async virtual Task<IResult> AddMovie(NewMovieDto newMovie)
     {
-        await _operations.AddMovieAsync(movie);
+        var validator = new NewMovieDtoValidator();
+        var result = validator.Validate(newMovie);
+
+        if (!result.IsValid) return TypedResults.ValidationProblem(result.ToDictionary());
+
+        var movie = await _operations.AddMovieAsync(newMovie);
 
         return TypedResults.Created($"/movies/{movie.Id}", movie);
     }
 
-    protected async virtual Task<IResult> UpdateMovie(Movie movie)
+    protected async virtual Task<IResult> UpdateMovie(Guid id, UpdateMovieDto updatedMovie)
     {
-        var updatedMovie = await _operations.UpdateMovieAsync(movie);
+        var validator = new UpdateMovieDtoValidator();
+        var result = validator.Validate(updatedMovie);
 
-        return updatedMovie is Movie ? TypedResults.NoContent() : TypedResults.NotFound();
+        if (!result.IsValid) return TypedResults.ValidationProblem(result.ToDictionary());
+
+        var movie = await _operations.UpdateMovieAsync(id, updatedMovie);
+
+        return movie is Movie ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
     protected async virtual Task<IResult> DeleteMovie(Guid id)

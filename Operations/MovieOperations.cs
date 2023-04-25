@@ -1,4 +1,6 @@
+using AutoMapper;
 using Data;
+using Data.DTOs;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,24 +8,27 @@ namespace Operations;
 
 public interface IMovieOperations
 {
-    public Task<Movie> AddMovieAsync(Movie movie);
+    public Task<Movie> AddMovieAsync(NewMovieDto movie);
     public Task<Movie?> DeleteMovieAsync(Guid id);
     public Task<Movie?> GetMovieAsync(Guid id);
-    public Task<Movie?> UpdateMovieAsync(Movie movie);
+    public Task<Movie?> UpdateMovieAsync(Guid id, UpdateMovieDto updateMovie);
     public Task<IEnumerable<Movie>> GetMoviesAsync();
 }
 
 public class MovieOperations : IMovieOperations
 {
     private readonly MovieCollectionContext _context;
+    private readonly IMapper _mapper;
 
-    public MovieOperations(MovieCollectionContext context)
+    public MovieOperations(MovieCollectionContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
-    public async Task<Movie> AddMovieAsync(Movie movie)
+    public async Task<Movie> AddMovieAsync(NewMovieDto newMovie)
     {
+        var movie = _mapper.Map<Movie>(newMovie);
         _context.Movies.Add(movie);
         await _context.SaveChangesAsync();
 
@@ -43,22 +48,16 @@ public class MovieOperations : IMovieOperations
         return null;
     }
 
-    public async Task<Movie?> UpdateMovieAsync(Movie movie)
+    public async Task<Movie?> UpdateMovieAsync(Guid id, UpdateMovieDto updatedMovie)
     {
-         var originalMovie = await _context.Movies.FindAsync(movie.Id);
+         var originalMovie = await _context.Movies.FindAsync(id);
 
         if (originalMovie is null) return null;
 
-        originalMovie.Title = movie.Title;
-        originalMovie.Description = movie.Description;
-        originalMovie.ReleaseDate = movie.ReleaseDate;
-        originalMovie.Rating = movie.Rating;
-        originalMovie.Description = movie.Description;
-        originalMovie.InventoryDate = movie.InventoryDate;
-
+        _mapper.Map(updatedMovie, originalMovie);
         await _context.SaveChangesAsync();
 
-        return movie;
+        return originalMovie;
     }
 
     public async Task<Movie?> GetMovieAsync(Guid id)
