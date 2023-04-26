@@ -7,7 +7,7 @@ namespace Routers;
 
 public class MovieRouter : RouterBase
 {
-    private IMovieOperations _operations;
+    private readonly IMovieOperations _operations;
 
     public MovieRouter(IMovieOperations operations)
     {
