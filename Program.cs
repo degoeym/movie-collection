@@ -10,13 +10,16 @@ using Routers;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<MovieCollectionContext>(opt => opt.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
+builder.Services.AddDbContext<MovieCollectionContext>(
+    opt => opt.UseNpgsql(connectionString).UseSnakeCaseNamingConvention()
+);
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped<IMovieOperations, MovieOperations>();
 builder.Services.AddScoped<RouterBase, MovieRouter>();
 
-var mappingConfig = new MapperConfiguration(mc => {
+var mappingConfig = new MapperConfiguration(mc =>
+{
     mc.AddProfile(new MovieCollectionProfile());
 });
 
@@ -27,7 +30,9 @@ builder.Services.AddSingleton(autoMapper);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.Configure<JsonOptions>(opt => opt.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.Configure<JsonOptions>(
+    opt => opt.SerializerOptions.Converters.Add(new JsonStringEnumConverter())
+);
 
 var app = builder.Build();
 var dbContext = app.Services.GetRequiredService<MovieCollectionContext>();

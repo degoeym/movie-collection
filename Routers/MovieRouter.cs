@@ -20,7 +20,10 @@ public class MovieRouter : RouterBase
         app.MapGet($"/{UrlFragment}", () => GetAllMovies());
         app.MapGet($"/{UrlFragment}/{{id:guid}}", (Guid id) => GetMovie(id));
         app.MapPost($"/{UrlFragment}", (NewMovieDto newMovie) => AddMovie(newMovie));
-        app.MapPut($"/{UrlFragment}/{{id:guid}}", (Guid id, UpdateMovieDto updatedMovie) => UpdateMovie(id, updatedMovie));
+        app.MapPut(
+            $"/{UrlFragment}/{{id:guid}}",
+            (Guid id, UpdateMovieDto updatedMovie) => UpdateMovie(id, updatedMovie)
+        );
         app.MapDelete($"/{UrlFragment}/{{id:guid}}", (Guid id) => DeleteMovie(id));
     }
 
@@ -39,7 +42,8 @@ public class MovieRouter : RouterBase
         var validator = new NewMovieDtoValidator();
         var result = validator.Validate(newMovie);
 
-        if (!result.IsValid) return TypedResults.ValidationProblem(result.ToDictionary());
+        if (!result.IsValid)
+            return TypedResults.ValidationProblem(result.ToDictionary());
 
         var movie = await _operations.AddMovieAsync(newMovie);
 
@@ -51,7 +55,8 @@ public class MovieRouter : RouterBase
         var validator = new UpdateMovieDtoValidator();
         var result = validator.Validate(updatedMovie);
 
-        if (!result.IsValid) return TypedResults.ValidationProblem(result.ToDictionary());
+        if (!result.IsValid)
+            return TypedResults.ValidationProblem(result.ToDictionary());
 
         var movie = await _operations.UpdateMovieAsync(id, updatedMovie);
 

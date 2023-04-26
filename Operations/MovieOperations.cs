@@ -50,9 +50,10 @@ public class MovieOperations : IMovieOperations
 
     public async Task<Movie?> UpdateMovieAsync(Guid id, UpdateMovieDto updatedMovie)
     {
-         var originalMovie = await _context.Movies.FindAsync(id);
+        var originalMovie = await _context.Movies.FindAsync(id);
 
-        if (originalMovie is null) return null;
+        if (originalMovie is null)
+            return null;
 
         _mapper.Map(updatedMovie, originalMovie);
         await _context.SaveChangesAsync();
@@ -62,10 +63,7 @@ public class MovieOperations : IMovieOperations
 
     public async Task<Movie?> GetMovieAsync(Guid id)
     {
-        return await _context.Movies.FindAsync(id)
-            is Movie movie
-                ? movie
-                : null;
+        return await _context.Movies.FindAsync(id) is Movie movie ? movie : null;
     }
 
     public async Task<IEnumerable<Movie>> GetMoviesAsync()

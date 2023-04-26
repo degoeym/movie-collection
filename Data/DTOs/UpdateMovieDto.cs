@@ -11,10 +11,7 @@ public record UpdateMovieDto
     public DateTime ReleaseDate { get; set; }
     public DateTime InventoryDate { get; set; }
 
-    public UpdateMovieDto()
-    {
-        
-    }
+    public UpdateMovieDto() { }
 }
 
 public class UpdateMovieDtoValidator : AbstractValidator<UpdateMovieDto>

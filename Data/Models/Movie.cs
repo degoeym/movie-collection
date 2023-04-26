@@ -18,9 +18,11 @@ public enum Rating
     Unknown = -1,
     G = 1,
     PG = 2,
+
     [EnumMember(Value = "PG-13")]
     PG13 = 3,
     R = 4,
+
     [EnumMember(Value = "NC-17")]
     NC17 = 5,
     X = 6,
